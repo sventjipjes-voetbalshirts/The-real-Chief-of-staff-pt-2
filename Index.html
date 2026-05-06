@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lynne Planner</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+:root{--bg:#fff;--bg2:#f7f7f5;--bg3:#f0efe9;--text:#1a1a1a;--text2:#6b6b6b;--text3:#a0a0a0;--border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.22);--r:8px;--rl:12px;--blue-bg:#E6F1FB;--blue-t:#0C447C;--blue-b:#378ADD;--green-bg:#EAF3DE;--green-t:#27500A;--green-b:#639922;--amber-bg:#FAEEDA;--amber-t:#633806;--amber-b:#BA7517;--pink-bg:#FBEAF0;--pink-t:#72243E;--pink-b:#D4537E;--purple-bg:#EEEDFE;--purple-t:#3C3489;--purple-b:#7F77DD;--gray-bg:#F1EFE8;--gray-t:#444441;--gray-b:#888780;--coral-bg:#FAECE7;--coral-t:#712B13;--coral-b:#D85A30;--red-bg:#FCEBEB;--red-t:#791F1F;--red-b:#E24B4A;}
+@media(prefers-color-scheme:dark){:root{--bg:#1e1e1e;--bg2:#2a2a2a;--bg3:#333;--text:#f0f0f0;--text2:#a0a0a0;--text3:#666;--border:rgba(255,255,255,0.12);--border2:rgba(255,255,255,0.22);--blue-bg:#0C2A44;--blue-t:#85B7EB;--green-bg:#173404;--green-t:#97C459;--amber-bg:#2a1a00;--amber-t:#EF9F27;--pink-bg:#2a0e1a;--pink-t:#ED93B1;--purple-bg:#1a1840;--purple-t:#AFA9EC;--gray-bg:#2C2C2A;--gray-t:#B4B2A9;--coral-bg:#2a0e06;--coral-t:#F0997B;--red-bg:#1f0808;--red-t:#F09595;}}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg3);color:var(--text);min-height:100vh;}
+.app{max-width:920px;margin:0 auto;padding:1.5rem 1rem;}
+h1{font-size:20px;font-weight:500;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px;}
+.tabs{display:flex;border-bottom:0.5px solid var(--border);margin-bottom:1.25rem;flex-wrap:wrap;}
+.tab{padding:9px 12px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;background:none;border-top:none;border-left:none;border-right:none;white-space:nowrap;}
+.tab.active{color:var(--text);border-bottom-color:var(--text);}
+.panel{display:none;}.panel.active{display:block;}
+.sl{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:0.6rem;}
+.row{display:flex;gap:6px;margin-top:0.75rem;flex-wrap:wrap;}
+.inp{flex:1;min-width:120px;font-size:13px;padding:8px 10px;border-radius:var(--r);border:0.5px solid var(--border);background:var(--bg);color:var(--text);}
+.inp:focus{outline:none;border-color:var(--border2);}
+.sel{font-size:12px;padding:8px 8px;border-radius:var(--r);border:0.5px solid var(--border);background:var(--bg);color:var(--text2);}
+.btn{padding:8px 12px;border-radius:var(--r);border:0.5px solid var(--border2);background:transparent;font-size:13px;color:var(--text);cursor:pointer;}
+.btn:hover{background:var(--bg2);}
+.btn-blue{background:var(--blue-bg);color:var(--blue-t);border:0.5px solid var(--blue-b)!important;}
+.btn-green{background:var(--green-bg);color:var(--green-t);border:0.5px solid var(--green-b)!important;}
+.btn:disabled{opacity:0.5;cursor:default;}
+/* MORNING */
+.morning{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem;}
+.mbtn{padding:11px 16px;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:8px;border:none;}
+.mbtn:disabled{opacity:0.5;cursor:default;}
+/* WEEK */
+.wh{display:flex;align-items:center;gap:12px;margin-bottom:1rem;}
+.wnav{background:none;border:0.5px solid var(--border2);border-radius:var(--r);padding:6px 10px;cursor:pointer;color:var(--text2);}
+.wnav:hover{background:var(--bg2);}
+.wt{font-size:17px;font-weight:500;flex:1;}.ws{font-size:12px;color:var(--text2);}
+.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:1rem;}
+.dc{border-radius:var(--rl);border:0.5px solid var(--border);overflow:hidden;background:var(--bg);}
+.dc.today{border:1.5px solid var(--blue-b);}
+.dh{padding:8px 10px;border-bottom:0.5px solid var(--border);}
+.dn{font-size:10px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--text3);}
+.dd{font-size:18px;font-weight:500;line-height:1.2;}.dc.today .dd{color:var(--blue-t);}
+.dt{padding:6px;display:flex;flex-direction:column;gap:4px;min-height:70px;}
+.pill{display:flex;align-items:flex-start;gap:6px;padding:6px 8px;border-radius:var(--r);cursor:pointer;border:0.5px solid transparent;}
+.pill:hover{border-color:var(--border);}
+.pill.done{opacity:0.4;}.pill.done .pt{text-decoration:line-through;}
+.pd{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.pt{font-size:11.5px;line-height:1.4;flex:1;}
+.xbtn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:13px;padding:1px 3px;display:none;}
+.pill:hover .xbtn{display:block;}
+.cat-weekstart{background:var(--blue-bg);}.pd-weekstart{background:var(--blue-b);}
+.cat-mt{background:var(--green-bg);}.pd-mt{background:var(--green-b);}
+.cat-staff{background:var(--amber-bg);}.pd-staff{background:var(--amber-b);}
+.cat-review{background:var(--pink-bg);}.pd-review{background:var(--pink-b);}
+.cat-focus{background:var(--purple-bg);}.pd-focus{background:var(--purple-b);}
+.cat-event{background:var(--coral-bg);}.pd-event{background:var(--coral-b);}
+.cat-overig{background:var(--gray-bg);}.pd-overig{background:var(--gray-b);}
+.leg{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem;}
+.li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);}
+.ld{width:8px;height:8px;border-radius:50%;}
+/* PG */
+.pgt{width:100%;border-collapse:collapse;font-size:13px;}
+.pgt th{text-align:left;padding:7px 10px;font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text3);border-bottom:0.5px solid var(--border);}
+.pgr{border-bottom:0.5px solid var(--border);}.pgr:last-child{border-bottom:none;}
+.pgr td{padding:8px 10px;vertical-align:top;}
+.pgr.done td{opacity:0.45;}.pgr.done .pgp{text-decoration:line-through;}
+.pgp{color:var(--text);cursor:pointer;line-height:1.4;}.pgp:hover{color:var(--blue-t);}
+.sb{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;cursor:pointer;white-space:nowrap;}
+.s-open{background:var(--gray-bg);color:var(--gray-t);}.s-lopend{background:var(--blue-bg);color:var(--blue-t);}
+.s-gedaan{background:var(--green-bg);color:var(--green-t);}.s-geblokkeerd{background:var(--red-bg);color:var(--red-t);}
+.pgn{font-size:12px;color:var(--text2);margin-top:3px;cursor:pointer;}
+.ni{width:100%;font-size:12px;padding:5px 8px;border-radius:var(--r);border:0.5px solid var(--border);background:var(--bg);color:var(--text);margin-top:4px;}
+.ni:focus{outline:none;border-color:var(--border2);}
+/* NV */
+.nvi{display:flex;align-items:flex-start;gap:8px;padding:9px 10px;border-radius:var(--r);border:0.5px solid var(--border);margin-bottom:4px;background:var(--bg);}
+.nvi.done{opacity:0.4;}.nvi.done .nvt{text-decoration:line-through;}
+.nvc{width:17px;height:17px;border-radius:50%;border:1.5px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;margin-top:1px;}
+.nvc.on{background:var(--green-bg);border-color:var(--green-b);}
+.nvt{flex:1;font-size:13px;line-height:1.4;}
+/* RECUR */
+.rl{display:flex;flex-direction:column;gap:4px;margin-bottom:1rem;}
+.ri{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r);background:var(--bg2);font-size:12px;}
+/* EVENTS */
+.er{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--r);border:0.5px solid var(--border);margin-bottom:4px;background:var(--bg);}
+.yl{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin:1rem 0 0.5rem;}
+/* NOTES */
+.nc{border-radius:var(--rl);border:0.5px solid var(--border);background:var(--bg);overflow:hidden;margin-bottom:8px;}
+.nh{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:0.5px solid var(--border);background:var(--bg2);}
+.ntag{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:500;}
+.nb{padding:10px 12px;font-size:13px;line-height:1.6;white-space:pre-wrap;}
+.nab{margin:0 12px 10px;padding:10px 12px;border-radius:var(--r);background:var(--bg2);border:0.5px solid var(--border);}
+.nf{display:flex;gap:6px;padding:6px 12px;border-top:0.5px solid var(--border);}
+.nfb{background:none;border:none;cursor:pointer;font-size:12px;color:var(--text2);padding:3px 6px;border-radius:var(--r);display:flex;align-items:center;gap:4px;}
+.nfb:hover{background:var(--bg2);}
+/* RECORDING */
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+@keyframes rp{0%,100%{box-shadow:0 0 0 0 rgba(226,75,74,0.4)}50%{box-shadow:0 0 0 14px rgba(226,75,74,0)}}
+.recbtn{width:72px;height:72px;border-radius:50%;border:none;background:var(--red-bg);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.recbtn.active{animation:rp 1.5s infinite;}
+.recdot{width:8px;height:8px;border-radius:50%;background:#E24B4A;animation:blink 1s infinite;}
+.bres{padding:14px 16px;border-radius:var(--rl);border:0.5px solid var(--border);background:var(--bg);font-size:13px;line-height:1.7;white-space:pre-wrap;display:none;margin-bottom:1rem;}
+</style>
+</head>
+<body>
+<div class="app">
+  <h1><i class="ti ti-calendar" style="font-size:20px;color:#378ADD"></i> Lynne Planner</h1>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('week')">Week</button>
+    <button class="tab" onclick="switchTab('pg')">PG Lynne</button>
+    <button class="tab" onclick="switchTab('nv')">Niet vergeten</button>
+    <button class="tab" onclick="switchTab('ritme')">Ritme</button>
+    <button class="tab" onclick="switchTab('events')">Momenten</button>
+    <button class="tab" onclick="switchTab('notes')">Notes</button>
+    <button class="tab" onclick="switchTab('rec')">Opname</button>
+  </div>
+
+  <!-- WEEK -->
+  <div class="panel active" id="panel-week">
+    <div class="morning">
+      <button class="mbtn btn-blue" id="bb" onclick="doBriefing()"><i class="ti ti-sparkles" style="font-size:16px"></i>Dagbriefing</button>
+      <button class="mbtn btn-green" id="bm" onclick="doMail()"><i class="ti ti-mail" style="font-size:16px"></i>Stuur dagmail</button>
+    </div>
+    <div id="sbar" style="font-size:12px;color:var(--text2);min-height:18px;margin-bottom:0.5rem"></div>
+    <div class="bres" id="bres"></div>
+    <div class="wh" style="margin-top:0.5rem">
+      <button class="wnav" onclick="changeWeek(-1)"><i class="ti ti-arrow-left"></i></button>
+      <div><div class="wt" id="wtit"></div><div class="ws" id="wsub"></div></div>
+      <button class="wnav" onclick="changeWeek(1)"><i class="ti ti-arrow-right"></i></button>
+    </div>
+    <div class="leg">
+      <div class="li"><div class="ld pd-weekstart"></div>Weekstart</div>
+      <div class="li"><div class="ld pd-mt"></div>MT</div>
+      <div class="li"><div class="ld pd-staff"></div>Staff</div>
+      <div class="li"><div class="ld pd-review"></div>Review</div>
+      <div class="li"><div class="ld pd-focus"></div>Focus</div>
+      <div class="li"><div class="ld pd-event"></div>Moment</div>
+    </div>
+    <div class="grid" id="wgrid"></div>
+    <div class="row">
+      <input class="inp" id="nt" placeholder="Taak toevoegen..." onkeydown="if(event.key==='Enter')addTask()"/>
+      <select class="sel" id="nd"><option value="0">Ma</option><option value="1">Di</option><option value="2">Wo</option><option value="3">Do</option><option value="4">Vr</option></select>
+      <select class="sel" id="nc"><option value="weekstart">Weekstart</option><option value="mt">MT</option><option value="staff">Staff</option><option value="review">Review</option><option value="focus">Focus</option><option value="event">Moment</option><option value="overig">Overig</option></select>
+      <button class="btn" onclick="addTask()"><i class="ti ti-plus"></i></button>
+    </div>
+  </div>
+
+  <!-- PG -->
+  <div class="panel" id="panel-pg">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+      <p class="sl" style="margin:0">PG Lynne — actiepunten</p>
+      <select class="sel" id="pgf" onchange="renderPG()"><option value="all">Alles</option><option value="open">Open</option><option value="lopend">Lopend</option><option value="gedaan">Gedaan</option><option value="geblokkeerd">Geblokkeerd</option></select>
+    </div>
+    <div style="background:var(--bg);border-radius:var(--rl);border:0.5px solid var(--border);overflow:hidden">
+      <table class="pgt"><thead><tr><th style="width:38%">Punt</th><th style="width:18%">Status</th><th>Notities</th><th style="width:30px"></th></tr></thead><tbody id="pgb"></tbody></table>
+    </div>
+    <div class="row"><input class="inp" id="npg" placeholder="Nieuw actiepunt..." onkeydown="if(event.key==='Enter')addPG()"/><button class="btn" onclick="addPG()"><i class="ti ti-plus"></i></button></div>
+  </div>
+
+  <!-- NV -->
+  <div class="panel" id="panel-nv">
+    <p class="sl">Niet vergeten</p>
+    <div id="nvl"></div>
+    <div class="row"><input class="inp" id="nnv" placeholder="Iets wat je niet wil vergeten..." onkeydown="if(event.key==='Enter')addNV()"/><button class="btn" onclick="addNV()"><i class="ti ti-plus"></i></button></div>
+  </div>
+
+  <!-- RITME -->
+  <div class="panel" id="panel-ritme">
+    <p class="sl">Vaste wekelijkse taken</p>
+    <div class="rl" id="rlist"></div>
+    <div class="row">
+      <input class="inp" id="nrec" placeholder="Vaste taak..." onkeydown="if(event.key==='Enter')addRecur()"/>
+      <select class="sel" id="nrd"><option value="0">Maandag</option><option value="1">Dinsdag</option><option value="2">Woensdag</option><option value="3">Donderdag</option><option value="4">Vrijdag</option></select>
+      <select class="sel" id="nrc"><option value="weekstart">Weekstart</option><option value="mt">MT</option><option value="staff">Staff</option><option value="review">Review</option><option value="focus">Focus</option><option value="event">Moment</option><option value="overig">Overig</option></select>
+      <button class="btn" onclick="addRecur()"><i class="ti ti-plus"></i></button>
+    </div>
+  </div>
+
+  <!-- MOMENTEN -->
+  <div class="panel" id="panel-events">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+      <p class="sl" style="margin:0">Grote momenten</p>
+      <select class="sel" id="yf" onchange="renderEvents()"><option value="all">Alle jaren</option><option value="2026">2026</option><option value="2027">2027</option></select>
+    </div>
+    <div id="evl"></div>
+    <div class="row" style="margin-top:1rem">
+      <input class="inp" id="nen" placeholder="Naam evenement..."/>
+      <input class="inp" id="ned" type="date" style="max-width:150px"/>
+      <button class="btn" onclick="addEvent()"><i class="ti ti-plus"></i></button>
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  <div class="panel" id="panel-notes">
+    <p class="sl">Nieuwe note</p>
+    <textarea id="noteinp" placeholder="Dump hier gedachten, observaties, ideeën... De AI zet het om naar actiepunten." style="width:100%;min-height:130px;font-size:14px;padding:12px 14px;border-radius:var(--rl);border:0.5px solid var(--border);background:var(--bg);color:var(--text);line-height:1.6;resize:vertical;font-family:inherit;display:block;"></textarea>
+    <div style="display:flex;gap:8px;margin-top:.75rem;flex-wrap:wrap">
+      <button class="btn" onclick="saveNote()"><i class="ti ti-device-floppy" style="margin-right:4px"></i>Opslaan</button>
+      <button id="bconv" onclick="saveAndConvert()" class="btn btn-blue" style="display:flex;align-items:center;gap:6px"><i class="ti ti-sparkles"></i>Opslaan + omzetten naar actiepunten</button>
+    </div>
+    <div id="nstat" style="font-size:12px;color:var(--text2);min-height:18px;margin-top:6px"></div>
+    <div id="notelist" style="margin-top:1.25rem"></div>
+  </div>
+
+  <!-- OPNAME -->
+  <div class="panel" id="panel-rec">
+    <div style="margin-bottom:1rem">
+      <p class="sl" style="margin-bottom:.4rem">OpenAI API key (voor Whisper transcriptie)</p>
+      <div style="display:flex;gap:6px;align-items:center">
+        <input type="password" id="oaikey" placeholder="sk-..." style="flex:1;font-size:13px;padding:8px 10px;border-radius:var(--r);border:0.5px solid var(--border);background:var(--bg);color:var(--text)" oninput="saveKey()"/>
+        <span id="kstat" style="font-size:12px;color:var(--green-t);min-width:80px"></span>
+      </div>
+      <p style="font-size:11px;color:var(--text3);margin-top:4px">Wordt alleen lokaal opgeslagen in jouw browser.</p>
+    </div>
+    <div style="margin-bottom:1rem">
+      <p class="sl" style="margin-bottom:.4rem">Naam van de meeting</p>
+      <input type="text" id="mname" placeholder="bijv. MT week 20, staff meeting, 1:1 Daan..." style="width:100%;font-size:13px;padding:8px 10px;border-radius:var(--r);border:0.5px solid var(--border);background:var(--bg);color:var(--text)"/>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:2rem 0">
+      <button id="recbtn" class="recbtn" onclick="toggleRec()"><i class="ti ti-microphone" id="recico" style="font-size:28px;color:#A32D2D"></i></button>
+      <div id="reclbl" style="font-size:13px;color:var(--text2)">Druk om op te nemen</div>
+      <div id="rectim" style="font-size:24px;font-weight:500;display:none">0:00</div>
+      <div id="recind" style="display:none;align-items:center;gap:6px"><div class="recdot"></div><span style="font-size:12px;color:#A32D2D;font-weight:500">Opname bezig</span></div>
+    </div>
+    <div id="recstat" style="font-size:13px;color:var(--text2);text-align:center;min-height:20px;margin-bottom:1rem"></div>
+    <div id="recres" style="display:none">
+      <div style="border-radius:var(--rl);border:0.5px solid var(--border);background:var(--bg);overflow:hidden;margin-bottom:1rem">
+        <div style="display:flex;align-items:center;padding:8px 12px;border-bottom:0.5px solid var(--border);background:var(--bg2)">
+          <span style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);flex:1">Transcriptie</span>
+          <button onclick="var t=document.getElementById('trbody');t.style.display=t.style.display==='none'?'block':'none'" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--text2)">tonen/verbergen</button>
+        </div>
+        <div id="trbody" style="padding:12px;font-size:13px;line-height:1.6;white-space:pre-wrap;max-height:200px;overflow-y:auto;display:none"></div>
+      </div>
+      <div id="recab" style="display:none">
+        <div style="border-radius:var(--rl);border:0.5px solid var(--border);background:var(--bg);overflow:hidden;margin-bottom:1rem">
+          <div style="padding:8px 12px;border-bottom:0.5px solid var(--border);background:var(--bg2)"><span class="sl" style="margin:0">Actiepunten — selecteer wat je wil toevoegen</span></div>
+          <div id="recal" style="padding:8px 12px"></div>
+        </div>
+        <div style="border-radius:var(--rl);border:0.5px solid var(--border);background:var(--bg);overflow:hidden;margin-bottom:1rem">
+          <div style="padding:8px 12px;border-bottom:0.5px solid var(--border);background:var(--bg2)"><span class="sl" style="margin:0">Afspraken & besluiten</span></div>
+          <div id="recdl" style="padding:8px 12px"></div>
+        </div>
+        <div style="border-radius:var(--rl);border:0.5px solid var(--border);background:var(--bg);overflow:hidden;margin-bottom:1rem">
+          <div style="padding:8px 12px;border-bottom:0.5px solid var(--border);background:var(--bg2)"><span class="sl" style="margin:0">Samenvatting</span></div>
+          <div id="recsum" style="padding:12px;font-size:13px;line-height:1.6"></div>
+        </div>
+        <button onclick="recToPG()" class="btn btn-green" style="padding:9px 18px"><i class="ti ti-arrow-right" style="margin-right:4px"></i>Voeg actiepunten toe aan PG Lynne</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// DATA
+const DS=['Ma','Di','Wo','Do','Vr'];
+const DF=['maandag','dinsdag','woensdag','donderdag','vrijdag'];
+const MO=['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+const ML=['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+const CL={weekstart:'Weekstart',mt:'MT',staff:'Staff',review:'Review',focus:'Focus',event:'Moment',overig:'Overig'};
+const ST=['open','lopend','gedaan','geblokkeerd'];
+const SL={open:'Open',lopend:'Lopend',gedaan:'Gedaan',geblokkeerd:'Geblokkeerd'};
+
+let wo=0,tasks={},recur=[],events=[],pg=[],nv=[],notes=[];
+let recActs=[],recDecs=[],recSum='',recTr='';
+let mr=null,ac=[],ri=null,rs=0;
+
+const DR=[
+  {day:0,text:"Weekstart schrijven (tekst + KPI's)",cat:'weekstart'},
+  {day:0,text:'Agenda sturen staff meetings',cat:'staff'},
+  {day:2,text:'MT agenda sturen per mail',cat:'mt'},
+  {day:2,text:'Groot topic (focus)',cat:'focus'},
+  {day:4,text:'Groot topic (focus)',cat:'focus'},
+];
+const DPG=[
+  {punt:'Meeting voor de tafels uit',status:'gedaan',notes:''},
+  {punt:'Jaarkalender proces',status:'gedaan',notes:''},
+  {punt:'Business review',status:'open',notes:''},
+  {punt:'Staff meeting maandag',status:'open',notes:''},
+  {punt:'Prio planning zie app Lynne Remco',status:'open',notes:''},
+  {punt:'Mailtje over preread tafel',status:'open',notes:''},
+  {punt:'Trading dashboard',status:'open',notes:''},
+  {punt:'Coolblue',status:'open',notes:''},
+  {punt:'Routes Lynne om de 6 wkn op woensdag niet op vrijdag',status:'open',notes:''},
+  {punt:'Bus review schema 16 uur',status:'open',notes:''},
+  {punt:'Impact overzicht',status:'open',notes:''},
+  {punt:'Q momenten',status:'open',notes:''},
+  {punt:'2027 momenten LT en MT',status:'open',notes:''},
+  {punt:'LT check out',status:'open',notes:''},
+  {punt:'Duurzaamheid / advies → interview',status:'gedaan',notes:''},
+  {punt:'Voorwoord CEO duurzaamheid',status:'open',notes:''},
+  {punt:'Franchise overleg structuur',status:'open',notes:''},
+  {punt:'Questie ownership op MT week 20',status:'gedaan',notes:''},
+  {punt:'Tijd voor impact vertalen naar Tijd voor impact voor MT leden met elkaar',status:'open',notes:''},
+];
+const DE=[
+  {name:'SPKO / EBR',date:'2026-01-05',cat:'event'},{name:'Budget BR',date:'2026-01-12',cat:'review'},{name:'MT dag',date:'2026-01-19',cat:'mt'},{name:'LT dag',date:'2026-01-26',cat:'event'},{name:'HK Q update',date:'2026-02-02',cat:'event'},{name:'Open Huis NO',date:'2026-02-09',cat:'event'},{name:'MBO in teams',date:'2026-02-16',cat:'overig'},{name:'MBO in teams',date:'2026-02-23',cat:'overig'},{name:'Int. Vrouwendag',date:'2026-03-09',cat:'overig'},{name:'BR',date:'2026-03-23',cat:'review'},{name:'Kick Off SPKO',date:'2026-03-27',cat:'event'},{name:'SPKO Friday',date:'2026-03-27',cat:'focus'},{name:'Meeting Sjoerd & Simon',date:'2026-03-30',cat:'mt'},{name:'SPKO Friday',date:'2026-04-03',cat:'focus'},{name:'OC&C Margaret',date:'2026-04-06',cat:'event'},{name:'MT Strategie',date:'2026-04-06',cat:'mt'},{name:'LT Lunch',date:'2026-04-14',cat:'event'},{name:'SPKO Friday',date:'2026-04-17',cat:'focus'},{name:'Strategie update (EN)',date:'2026-04-20',cat:'event'},{name:'WUK Comms',date:'2026-04-20',cat:'overig'},{name:'SPKO 70%',date:'2026-04-27',cat:'event'},{name:'Jubileumlunch',date:'2026-04-27',cat:'overig'},{name:'Open Huis ZW',date:'2026-04-27',cat:'event'},{name:'Submissie SPKO EU',date:'2026-04-30',cat:'event'},{name:'SPKO 90% / FPP',date:'2026-05-04',cat:'event'},{name:'Open Huis NW',date:'2026-05-04',cat:'event'},{name:'Capex Roadmap 2027',date:'2026-05-11',cat:'focus'},{name:"Prio's bepalen 2027",date:'2026-05-18',cat:'focus'},{name:'MT 2-daagse',date:'2026-05-21',cat:'mt'},{name:'MT 2-daagse dag 2',date:'2026-05-22',cat:'mt'},{name:'LT dag',date:'2026-06-02',cat:'event'},{name:'Washington',date:'2026-06-08',cat:'event'},{name:'Pre Submissie EU FC3',date:'2026-06-10',cat:'event'},{name:'CFO Alignment EU FC3',date:'2026-06-12',cat:'event'},{name:'BBQ DC',date:'2026-06-12',cat:'overig'},{name:'EU BR Prep 1',date:'2026-06-13',cat:'review'},{name:'Leveranciersdag',date:'2026-06-18',cat:'event'},{name:'EU BR Prep 2',date:'2026-06-20',cat:'review'},{name:'Submissie EPM FC3',date:'2026-06-20',cat:'event'},{name:'EU BR',date:'2026-06-22',cat:'review'},{name:'Winkeldagen',date:'2026-06-23',cat:'event'},{name:'Winkeldagen dag 2',date:'2026-06-24',cat:'event'},{name:'Zomerborrel HK',date:'2026-06-29',cat:'overig'},{name:'Etos BBQ',date:'2026-08-20',cat:'overig'},{name:'MT dag',date:'2026-08-14',cat:'mt'},{name:'MT 2-daagse (optie)',date:'2026-08-27',cat:'mt'},{name:'Pre Submissie EU FC4',date:'2026-08-27',cat:'event'},{name:'CFO Alignment EU FC4',date:'2026-09-01',cat:'event'},{name:'Domein Presentaties',date:'2026-09-04',cat:'event'},{name:'Submissie EPM FC4',date:'2026-09-08',cat:'event'},{name:'MT 2-daagse',date:'2026-09-10',cat:'mt'},{name:'MT 2-daagse dag 2',date:'2026-09-11',cat:'mt'},{name:'Open Huis NW',date:'2026-09-14',cat:'event'},{name:'EBR Friday',date:'2026-09-18',cat:'event'},{name:'EBR Friday',date:'2026-09-26',cat:'event'},{name:'Start MBO',date:'2026-09-28',cat:'overig'},{name:'Open Huis ZW',date:'2026-09-28',cat:'event'},{name:'EBR Friday',date:'2026-10-02',cat:'event'},{name:'Open Huis ZO',date:'2026-10-05',cat:'event'},{name:'LT dag – plan',date:'2026-10-06',cat:'event'},{name:'EBR',date:'2026-10-08',cat:'event'},{name:'MT dag – plan',date:'2026-10-30',cat:'mt'},{name:'MT 2-daagse',date:'2026-11-12',cat:'mt'},{name:'MT 2-daagse dag 2',date:'2026-11-13',cat:'mt'},{name:'Jubileumlunch',date:'2026-11-19',cat:'overig'},{name:'LT dag – Plan 2027',date:'2026-11-27',cat:'event'},{name:'Sint Roast',date:'2026-12-07',cat:'overig'},{name:'Kerstborrel HK',date:'2026-12-14',cat:'overig'},
+  {name:'MT 2-daagse – Ready for 2027',date:'2027-01-11',cat:'mt'},{name:'MT 2-daagse dag 2',date:'2027-01-12',cat:'mt'},{name:'MT teamdag',date:'2027-01-15',cat:'mt'},{name:'LT dag – Ready for 2027',date:'2027-01-18',cat:'event'},{name:'Open Huis NO',date:'2027-01-25',cat:'event'},{name:'WUK Comms',date:'2027-02-08',cat:'overig'},{name:'Int. Vrouwendag',date:'2027-03-08',cat:'overig'},{name:'SPKO',date:'2027-03-22',cat:'event'},{name:'Submissie SPKO EU',date:'2027-03-29',cat:'event'},{name:'SPKO Friday',date:'2027-04-05',cat:'focus'},{name:'SPKO Friday',date:'2027-04-19',cat:'focus'},{name:'SPKO Friday',date:'2027-04-26',cat:'focus'},{name:'LT dag – Trends',date:'2027-05-03',cat:'event'},{name:'Open Huis NW',date:'2027-05-24',cat:'event'},{name:'MT team',date:'2027-05-27',cat:'mt'},{name:'MT team dag 2',date:'2027-05-28',cat:'mt'},{name:'LT dag',date:'2027-06-10',cat:'event'},{name:'Leveranciersdag',date:'2027-06-21',cat:'event'},{name:'ZomerBorrel HK',date:'2027-06-28',cat:'overig'},{name:'Etos BBQ',date:'2027-08-26',cat:'overig'},{name:'MT 2-daagse',date:'2027-09-16',cat:'mt'},{name:'MT 2-daagse dag 2',date:'2027-09-17',cat:'mt'},{name:'MT Diner',date:'2027-09-15',cat:'mt'},{name:'Domein Presentaties',date:'2027-09-10',cat:'event'},{name:'EBR Friday',date:'2027-09-20',cat:'event'},{name:'EBR Friday',date:'2027-09-27',cat:'event'},{name:'EBR',date:'2027-10-04',cat:'event'},{name:'Open Huis ZW',date:'2027-10-11',cat:'event'},{name:'Start MBO',date:'2027-10-18',cat:'overig'},{name:'MT 2-daagse',date:'2027-11-08',cat:'mt'},{name:'MT 2-daagse dag 2',date:'2027-11-09',cat:'mt'},{name:'Open Huis ZO',date:'2027-11-03',cat:'event'},{name:'LT dag – Plan 2027',date:'2027-12-03',cat:'event'},{name:'Sint Roast',date:'2027-12-06',cat:'overig'},{name:'Kerstborrel HK',date:'2027-12-13',cat:'overig'},
+];
+
+// UTILS
+function mon(o){const d=new Date(),w=d.getDay();d.setDate(d.getDate()+(w===0?-6:1-w)+o*7);d.setHours(0,0,0,0);return d;}
+function wkey(o){const m=mon(o);return m.getFullYear()+'-'+m.getMonth()+'-'+m.getDate();}
+function fd(d){return d.getDate()+' '+MO[d.getMonth()];}
+function fdl(d){return d.getDate()+' '+ML[d.getMonth()];}
+function fdt(ts){const d=new Date(ts);return d.getDate()+' '+MO[d.getMonth()]+' '+d.getFullYear()+', '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+function isT(d){const t=new Date();return d.getDate()===t.getDate()&&d.getMonth()===t.getMonth()&&d.getFullYear()===t.getFullYear();}
+function wn(d){const dt=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));dt.setUTCDate(dt.getUTCDate()+4-(dt.getUTCDay()||7));const y=new Date(Date.UTC(dt.getUTCFullYear(),0,1));return Math.ceil((((dt-y)/86400000)+1)/7);}
+function ns(s){const i=ST.indexOf(s);return ST[(i+1)%ST.length];}
+
+// STORAGE
+function saveAll(){try{localStorage.setItem('lp2_t',JSON.stringify(tasks));localStorage.setItem('lp2_r',JSON.stringify(recur));localStorage.setItem('lp2_e',JSON.stringify(events));localStorage.setItem('lp2_pg',JSON.stringify(pg));localStorage.setItem('lp2_nv',JSON.stringify(nv));localStorage.setItem('lp2_n',JSON.stringify(notes));}catch(e){}}
+function loadAll(){
+  try{
+    const t=localStorage.getItem('lp2_t'),r=localStorage.getItem('lp2_r'),e=localStorage.getItem('lp2_e'),p=localStorage.getItem('lp2_pg'),n=localStorage.getItem('lp2_nv'),no=localStorage.getItem('lp2_n');
+    if(t)tasks=JSON.parse(t);
+    recur=r?JSON.parse(r):DR.map(x=>({...x}));
+    events=e?JSON.parse(e):DE.map(x=>({...x}));
+    pg=p?JSON.parse(p):DPG.map((x,i)=>({...x,id:i}));
+    nv=n?JSON.parse(n):[];
+    notes=no?JSON.parse(no):[];
+  }catch(x){recur=DR.map(x=>({...x}));events=DE.map(x=>({...x}));pg=DPG.map((x,i)=>({...x,id:i}));nv=[];notes=[];}
+}
+
+// WEEK
+function ensW(key){
+  if(!tasks[key]){
+    tasks[key]=[[],[],[],[],[]];
+    recur.forEach(r=>tasks[key][r.day].push({text:r.text,cat:r.cat,done:false,id:Math.random()}));
+    const m=mon(wo);
+    events.forEach(ev=>{
+      const ed=new Date(ev.date+'T00:00:00'),wd=ed.getDay();
+      if(wd>=1&&wd<=5){const em=new Date(ed);em.setDate(ed.getDate()-(wd-1));em.setHours(0,0,0,0);
+        if(em.getTime()===m.getTime())tasks[key][wd-1].unshift({text:ev.name,cat:ev.cat||'event',done:false,id:Math.random()});}
+    });
+    saveAll();
+  }
+}
+function renderWeek(){
+  const key=wkey(wo);ensW(key);
+  const m=mon(wo),f=new Date(m);f.setDate(m.getDate()+4);
+  document.getElementById('wtit').textContent='Week '+wn(m);
+  document.getElementById('wsub').textContent=fd(m)+' – '+fd(f);
+  const g=document.getElementById('wgrid');g.innerHTML='';
+  tasks[key].forEach((dt,di)=>{
+    const date=new Date(m);date.setDate(m.getDate()+di);
+    const col=document.createElement('div');col.className='dc'+(isT(date)?' today':'');
+    col.innerHTML=`<div class="dh"><div class="dn">${DS[di]}</div><div class="dd">${date.getDate()}</div></div>`;
+    const body=document.createElement('div');body.className='dt';
+    dt.forEach((t,ti)=>{
+      const p=document.createElement('div');p.className='pill cat-'+t.cat+(t.done?' done':'');
+      p.innerHTML=`<div class="pd pd-${t.cat}"></div><div style="flex:1"><div class="pt">${t.text}</div></div><button class="xbtn" onclick="delT('${key}',${di},${ti},event)"><i class="ti ti-x"></i></button>`;
+      p.addEventListener('click',e=>{if(!e.target.closest('.xbtn'))togT(key,di,ti);});
+      body.appendChild(p);
+    });
+    col.appendChild(body);g.appendChild(col);
+  });
+}
+function togT(key,di,ti){tasks[key][di][ti].done=!tasks[key][di][ti].done;saveAll();renderWeek();}
+function delT(key,di,ti,e){e.stopPropagation();tasks[key][di].splice(ti,1);saveAll();renderWeek();}
+function addTask(){const t=document.getElementById('nt').value.trim(),d=+document.getElementById('nd').value,c=document.getElementById('nc').value;if(!t)return;const key=wkey(wo);ensW(key);tasks[key][d].push({text:t,cat:c,done:false,id:Math.random()});document.getElementById('nt').value='';saveAll();renderWeek();}
+function changeWeek(d){wo+=d;renderWeek();}
+
+// PG
+function renderPG(){
+  const f=document.getElementById('pgf')?.value||'all',tb=document.getElementById('pgb');tb.innerHTML='';
+  pg.forEach((item,i)=>{
+    if(f!=='all'&&item.status!==f)return;
+    const tr=document.createElement('tr');tr.className='pgr'+(item.status==='gedaan'?' done':'');
+    const nid='n'+i;
+    tr.innerHTML=`<td><div class="pgp" onclick="cycS(${i})">${item.punt}</div></td><td><span class="sb s-${item.status}" onclick="cycS(${i})">${SL[item.status]}</span></td><td><div class="pgn" id="${nid}d" onclick="editN(${i},'${nid}')">${item.notes||'<span style="color:var(--text3)">Notitie...</span>'}</div><input class="ni" id="${nid}i" value="${(item.notes||'').replace(/"/g,'&quot;')}" style="display:none" onblur="saveN(${i},'${nid}')" onkeydown="if(event.key==='Enter')saveN(${i},'${nid}')"/></td><td><button style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:13px" onclick="delPG(${i})"><i class="ti ti-x"></i></button></td>`;
+    tb.appendChild(tr);
+  });
+}
+function cycS(i){pg[i].status=ns(pg[i].status);saveAll();renderPG();}
+function editN(i,nid){document.getElementById(nid+'d').style.display='none';const inp=document.getElementById(nid+'i');inp.style.display='block';inp.focus();}
+function saveN(i,nid){pg[i].notes=document.getElementById(nid+'i').value;saveAll();renderPG();}
+function delPG(i){pg.splice(i,1);saveAll();renderPG();}
+function addPG(){const t=document.getElementById('npg').value.trim();if(!t)return;pg.push({punt:t,status:'open',notes:'',id:Date.now()});document.getElementById('npg').value='';saveAll();renderPG();}
+function pushToPG(items,note){items.forEach(t=>pg.push({punt:t,status:'open',notes:note||'',id:Date.now()+Math.random()}));saveAll();}
+
+// NV
+function renderNV(){
+  const l=document.getElementById('nvl');l.innerHTML='';
+  if(!nv.length){l.innerHTML='<p style="font-size:13px;color:var(--text3);font-style:italic">Nog geen items.</p>';return;}
+  nv.forEach((item,i)=>{
+    const el=document.createElement('div');el.className='nvi'+(item.done?' done':'');
+    el.innerHTML=`<div class="nvc${item.done?' on':''}" onclick="togNV(${i})">${item.done?'<i class="ti ti-check" style="font-size:10px;color:var(--green-t)"></i>':''}</div><div class="nvt">${item.text}</div><button style="background:none;border:none;cursor:pointer;color:var(--text3)" onclick="delNV(${i})"><i class="ti ti-x"></i></button>`;
+    l.appendChild(el);
+  });
+}
+function togNV(i){nv[i].done=!nv[i].done;saveAll();renderNV();}
+function delNV(i){nv.splice(i,1);saveAll();renderNV();}
+function addNV(){const t=document.getElementById('nnv').value.trim();if(!t)return;nv.push({text:t,done:false,id:Date.now()});document.getElementById('nnv').value='';saveAll();renderNV();}
+
+// RITME
+function renderRitme(){
+  const l=document.getElementById('rlist');l.innerHTML='';
+  recur.forEach((r,i)=>{const el=document.createElement('div');el.className='ri';el.innerHTML=`<span style="font-weight:600;min-width:28px">${DS[r.day]}</span><div class="pd pd-${r.cat}" style="width:7px;height:7px;border-radius:50%;flex-shrink:0"></div><span style="flex:1;font-size:12px">${r.text}</span><span style="font-size:11px;color:var(--text3);margin-right:4px">${CL[r.cat]}</span><button style="background:none;border:none;cursor:pointer;color:var(--text3)" onclick="delR(${i})"><i class="ti ti-x"></i></button>`;l.appendChild(el);});
+}
+function addRecur(){const t=document.getElementById('nrec').value.trim(),d=+document.getElementById('nrd').value,c=document.getElementById('nrc').value;if(!t)return;recur.push({day:d,text:t,cat:c});document.getElementById('nrec').value='';saveAll();renderRitme();}
+function delR(i){recur.splice(i,1);saveAll();renderRitme();}
+
+// EVENTS
+function renderEvents(){
+  const f=document.getElementById('yf')?.value||'all',l=document.getElementById('evl');l.innerHTML='';
+  const sorted=[...events].sort((a,b)=>new Date(a.date)-new Date(b.date)).filter(ev=>f==='all'||ev.date.startsWith(f));
+  let ly='';
+  sorted.forEach(ev=>{
+    const idx=events.findIndex(e=>e.name===ev.name&&e.date===ev.date);
+    const ed=new Date(ev.date+'T00:00:00'),past=ed<new Date()&&!isT(ed),yr=ev.date.slice(0,4);
+    if(yr!==ly){const yl=document.createElement('div');yl.className='yl';yl.textContent=yr;l.appendChild(yl);ly=yr;}
+    const el=document.createElement('div');el.className='er';el.style.opacity=past?'0.4':'1';
+    el.innerHTML=`<div style="width:36px;text-align:center;flex-shrink:0"><div style="font-size:17px;font-weight:500;line-height:1">${ed.getDate()}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">${MO[ed.getMonth()]}</div></div><div class="pd pd-${ev.cat||'event'}" style="width:7px;height:7px;border-radius:50%;flex-shrink:0"></div><div style="flex:1;font-size:13px">${ev.name}</div><button style="background:none;border:none;cursor:pointer;color:var(--text3)" onclick="delEv(${idx})"><i class="ti ti-x"></i></button>`;
+    l.appendChild(el);
+  });
+}
+function addEvent(){const n=document.getElementById('nen').value.trim(),d=document.getElementById('ned').value;if(!n||!d)return;events.push({name:n,date:d,cat:'event'});document.getElementById('nen').value='';document.getElementById('ned').value='';saveAll();renderEvents();}
+function delEv(i){events.splice(i,1);saveAll();renderEvents();}
+
+// NOTES
+function renderNotes(){
+  const l=document.getElementById('notelist');
+  if(!notes.length){l.innerHTML='<p style="font-size:13px;color:var(--text3);font-style:italic">Nog geen notes.</p>';return;}
+  l.innerHTML='';
+  notes.forEach(note=>{
+    const card=document.createElement('div');card.className='nc';
+    const hasA=note.actions&&note.actions.length>0;
+    const actH=hasA?`<div class="nab"><p style="font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:8px">Selecteer actiepunten</p>${note.actions.map((a,ai)=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid var(--border)"><input type="checkbox" id="na${note.id}${ai}" ${a.selected?'checked':''} onchange="togNA(${note.id},${ai})"/><label for="na${note.id}${ai}" style="flex:1;font-size:13px;cursor:pointer">${a.text}</label></div>`).join('')}<button onclick="addNA(${note.id})" class="btn btn-green" style="margin-top:8px;padding:7px 14px">Voeg toe aan PG Lynne</button></div>`:
+      note.loading?'<div style="padding:8px 12px;font-size:12px;color:var(--text2)">Actiepunten genereren...</div>':'';
+    card.innerHTML=`<div class="nh"><span style="font-size:11px;color:var(--text3);flex:1"><i class="ti ti-clock" style="font-size:11px;margin-right:3px"></i>${fdt(note.ts)}</span>${note.omgezet?'<span class="ntag" style="background:var(--green-bg);color:var(--green-t)">Omgezet</span>':hasA?'<span class="ntag" style="background:var(--purple-bg);color:var(--purple-t)">Klaar</span>':''}</div><div class="nb">${note.text}</div>${actH}<div class="nf">${!hasA&&!note.loading?`<button class="nfb" onclick="convNote(${note.id})"><i class="ti ti-sparkles" style="font-size:13px"></i>Omzetten</button>`:''}<button class="nfb" onclick="delNote(${note.id})"><i class="ti ti-trash" style="font-size:13px"></i>Verwijderen</button></div>`;
+    l.appendChild(card);
+  });
+}
+
+function saveNote(){
+  const t=document.getElementById('noteinp').value.trim();if(!t)return;
+  notes.unshift({id:Date.now(),text:t,ts:Date.now(),actions:[],omgezet:false});
+  document.getElementById('noteinp').value='';saveAll();renderNotes();
+}
+
+async function saveAndConvert(){
+  const t=document.getElementById('noteinp').value.trim();
+  if(!t){document.getElementById('nstat').textContent='Schrijf eerst een note.';return;}
+  const btn=document.getElementById('bconv');btn.disabled=true;
+  document.getElementById('nstat').textContent='Actiepunten genereren...';
+  const id=Date.now();
+  notes.unshift({id,text:t,ts:id,actions:[],omgezet:false,loading:true});
+  document.getElementById('noteinp').value='';saveAll();renderNotes();
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages:[{role:'user',content:'Analyseer deze note en extraheer max 6 concrete actiepunten in het Nederlands. Begin elk punt met een werkwoord. Geef ALLEEN een JSON array terug, niets anders:\n["punt 1","punt 2"]\n\nNote:\n'+t}]})});
+    const d=await r.json();
+    const raw=d.content.map(c=>c.text||'').join('').trim().replace(/```json|```/g,'').trim();
+    const acts=JSON.parse(raw);
+    const idx=notes.findIndex(n=>n.id===id);
+    if(idx>=0){notes[idx].actions=acts.map(a=>({text:a,selected:true}));notes[idx].loading=false;}
+    document.getElementById('nstat').textContent='';
+  }catch(e){const idx=notes.findIndex(n=>n.id===id);if(idx>=0)notes[idx].loading=false;document.getElementById('nstat').textContent='Kon niet genereren.';}
+  btn.disabled=false;saveAll();renderNotes();
+}
+
+async function convNote(nid){
+  const note=notes.find(n=>n.id===nid);if(!note)return;
+  note.loading=true;saveAll();renderNotes();
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages:[{role:'user',content:'Analyseer deze note en extraheer max 6 concrete actiepunten in het Nederlands. Begin elk punt met een werkwoord. Geef ALLEEN een JSON array:\n["punt 1","punt 2"]\n\nNote:\n'+note.text}]})});
+    const d=await r.json();
+    const raw=d.content.map(c=>c.text||'').join('').trim().replace(/```json|```/g,'').trim();
+    note.actions=JSON.parse(raw).map(a=>({text:a,selected:true}));note.loading=false;
+  }catch(e){note.loading=false;}
+  saveAll();renderNotes();
+}
+
+function togNA(nid,ai){const n=notes.find(n=>n.id===nid);if(n&&n.actions[ai])n.actions[ai].selected=!n.actions[ai].selected;saveAll();renderNotes();}
+function addNA(nid){
+  const note=notes.find(n=>n.id===nid);if(!note)return;
+  const sel=note.actions.filter(a=>a.selected).map(a=>a.text);
+  if(!sel.length){document.getElementById('nstat').textContent='Selecteer minstens 1 punt.';return;}
+  pushToPG(sel,'Vanuit note: '+note.text.slice(0,60)+(note.text.length>60?'...':''));
+  note.omgezet=true;note.actions=[];saveAll();renderNotes();
+  document.getElementById('nstat').textContent=sel.length+' actiepunt'+(sel.length===1?'':'en')+' toegevoegd aan PG Lynne.';
+}
+function delNote(nid){notes=notes.filter(n=>n.id!==nid);saveAll();renderNotes();}
+
+// RECORDING
+function saveKey(){const k=document.getElementById('oaikey').value.trim();localStorage.setItem('oai_key',k);document.getElementById('kstat').textContent=k?'✓ Opgeslagen':'';}
+function loadKey(){const k=localStorage.getItem('oai_key')||'';document.getElementById('oaikey').value=k;if(k)document.getElementById('kstat').textContent='✓ Opgeslagen';}
+
+async function toggleRec(){
+  if(mr&&mr.state==='recording'){stopRec();return;}
+  const key=document.getElementById('oaikey').value.trim();
+  if(!key){document.getElementById('recstat').textContent='Vul eerst je OpenAI API key in.';return;}
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    ac=[];rs=0;
+    const mime=MediaRecorder.isTypeSupported('audio/webm')?'audio/webm':'audio/mp4';
+    mr=new MediaRecorder(stream,{mimeType:mime});
+    mr.ondataavailable=e=>{if(e.data.size>0)ac.push(e.data);};
+    mr.onstop=async()=>{stream.getTracks().forEach(t=>t.stop());await processRec();};
+    mr.start(1000);
+    document.getElementById('recbtn').classList.add('active');
+    document.getElementById('recico').className='ti ti-player-stop';
+    document.getElementById('reclbl').textContent='Klik om te stoppen';
+    document.getElementById('rectim').style.display='block';
+    document.getElementById('recind').style.display='flex';
+    document.getElementById('recres').style.display='none';
+    document.getElementById('recstat').textContent='';
+    ri=setInterval(()=>{rs++;const m=Math.floor(rs/60),s=rs%60;document.getElementById('rectim').textContent=m+':'+(s<10?'0':'')+s;},1000);
+  }catch(e){document.getElementById('recstat').textContent='Microfoon niet beschikbaar: '+e.message;}
+}
+
+function stopRec(){
+  if(mr&&mr.state==='recording')mr.stop();
+  clearInterval(ri);
+  document.getElementById('recbtn').classList.remove('active');
+  document.getElementById('recico').className='ti ti-microphone';
+  document.getElementById('reclbl').textContent='Druk om op te nemen';
+  document.getElementById('rectim').style.display='none';
+  document.getElementById('recind').style.display='none';
+  document.getElementById('recstat').textContent='Opname klaar — bezig met transcriberen...';
+}
+
+async function processRec(){
+  const key=document.getElementById('oaikey').value.trim();
+  const mn=document.getElementById('mname').value.trim()||'Meeting '+fd(new Date());
+  const mime=ac[0]?.type||'audio/webm',ext=mime.includes('mp4')?'m4a':'webm';
+  const blob=new Blob(ac,{type:mime});
+  try{
+    const fd2=new FormData();
+    fd2.append('file',new File([blob],'rec.'+ext,{type:mime}));
+    fd2.append('model','whisper-1');fd2.append('language','nl');
+    const wr=await fetch('https://api.openai.com/v1/audio/transcriptions',{method:'POST',headers:{Authorization:'Bearer '+key},body:fd2});
+    if(!wr.ok)throw new Error('Whisper fout '+wr.status);
+    const wd=await wr.json();
+    recTr=wd.text||'';
+    document.getElementById('trbody').textContent=recTr;
+    document.getElementById('recres').style.display='block';
+    document.getElementById('recstat').textContent='Transcriptie klaar — actiepunten genereren...';
+    const cr=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:'Analyseer dit meeting transcript. Meeting: '+mn+'\n\nTranscript:\n'+recTr+'\n\nGeef een JSON object terug (niets anders):\n{"actiepunten":["punt 1"],"afspraken":["afspraak 1"],"samenvatting":"2-3 zinnen"}\n\nActiepunten: max 8, begin met werkwoord. Afspraken/besluiten: max 6.'}]})});
+    const cd=await cr.json();
+    const raw=cd.content.map(c=>c.text||'').join('').trim().replace(/```json|```/g,'').trim();
+    const p=JSON.parse(raw);
+    recActs=(p.actiepunten||[]).map(a=>({text:a,selected:true}));
+    recDecs=p.afspraken||[];recSum=p.samenvatting||'';
+    document.getElementById('recal').innerHTML=recActs.length?recActs.map((a,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid var(--border)"><input type="checkbox" id="ra${i}" checked onchange="recActs[${i}].selected=this.checked"/><label for="ra${i}" style="flex:1;font-size:13px;cursor:pointer">${a.text}</label></div>`).join(''):'<p style="font-size:13px;color:var(--text3)">Geen gevonden.</p>';
+    document.getElementById('recdl').innerHTML=recDecs.length?recDecs.map(d=>`<div style="padding:5px 0;border-bottom:0.5px solid var(--border);font-size:13px">• ${d}</div>`).join(''):'<p style="font-size:13px;color:var(--text3)">Geen gevonden.</p>';
+    document.getElementById('recsum').textContent=recSum;
+    document.getElementById('recab').style.display='block';
+    document.getElementById('recstat').textContent='Klaar! Controleer en voeg toe aan PG.';
+    document.getElementById('mname').value='';
+  }catch(e){document.getElementById('recstat').textContent='Fout: '+e.message;}
+}
+
+function recToPG(){
+  const sel=recActs.filter(a=>a.selected).map(a=>a.text);
+  if(!sel.length){document.getElementById('recstat').textContent='Selecteer minstens 1 actiepunt.';return;}
+  pushToPG(sel,'Vanuit opname: '+recSum.slice(0,60));
+  document.getElementById('recstat').textContent=sel.length+' actiepunt'+(sel.length===1?'':'en')+' toegevoegd aan PG Lynne.';
+}
+
+// AI BRIEFING + MAIL
+function getCtx(){
+  const now=new Date(),td=now.getDay(),key=wkey(0);ensW(key);const m=mon(0);
+  let tt=[];if(td>=1&&td<=5)tt=tasks[key][td-1].filter(t=>!t.done).map(t=>t.text);
+  let wt=[];tasks[key].forEach((dt,di)=>{const d=new Date(m);d.setDate(m.getDate()+di);dt.filter(t=>!t.done).forEach(t=>{if(!isT(d))wt.push(DF[di]+': '+t.text);});});
+  const in4w=new Date(now);in4w.setDate(now.getDate()+28);
+  const up=events.map(ev=>({...ev,d:new Date(ev.date+'T00:00:00')})).filter(ev=>ev.d>=now&&ev.d<=in4w).sort((a,b)=>a.d-b.d).map(ev=>{const diff=Math.ceil((ev.d-now)/(1000*60*60*24));return{name:ev.name,date:fdl(ev.d),diff};});
+  const opg=pg.filter(p=>p.status==='open'||p.status==='lopend').map(p=>p.punt);
+  const onv=nv.filter(n=>!n.done).map(n=>n.text);
+  const dag=['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'][td];
+  return{dag,datum:fdl(now),weekNr:wn(m),tt,wt,up,opg,onv};
+}
+
+async function callC(prompt){
+  try{const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:prompt}]})});const d=await r.json();return d.content.map(c=>c.text||'').join('');}catch(e){return null;}
+}
+
+function mkPrompt(ctx,type){
+  const up=ctx.up.length?ctx.up.map(e=>`${e.name} (${e.date}, over ${e.diff} dag${e.diff===1?'':'en'})`).join('\n'):'Geen momenten komende 4 weken';
+  const pgS=ctx.opg.length?ctx.opg.slice(0,8).map(p=>'• '+p).join('\n'):'Geen open punten';
+  const nvS=ctx.onv.length?ctx.onv.map(n=>'• '+n).join('\n'):'Leeg';
+  const tS=ctx.tt.length?ctx.tt.map(t=>'• '+t).join('\n'):'Geen taken gepland';
+  const wS=ctx.wt.length?ctx.wt.map(t=>'• '+t).join('\n'):'Niets extra';
+  if(type==='mail')return `Schrijf een dagelijkse ochtendmail voor een directeur bij Etos. Voor haarzelf. Direct, warm, zakelijk.\n\nVandaag: ${ctx.dag} ${ctx.datum}, week ${ctx.weekNr}\n\nTAKEN VANDAAG:\n${tS}\n\nREST VAN DE WEEK:\n${wS}\n\nOPEN PG-ACTIEPUNTEN:\n${pgS}\n\nNIET VERGETEN:\n${nvS}\n\nGROTE MOMENTEN KOMENDE 4 WEKEN:\n${up}\n\nPlatte tekst, geen HTML. Kopjes in HOOFDLETTERS. Bullets met •. Sluit af met 1 motiverende zin.`;
+  return `Persoonlijke assistent directeur Etos. Dagbriefing in het Nederlands.\n\nVandaag: ${ctx.dag} ${ctx.datum}, week ${ctx.weekNr}\nTaken: ${ctx.tt.join(', ')||'geen'}\nWeek: ${ctx.wt.join('; ')||'niets'}\nPG open: ${ctx.opg.slice(0,4).join(', ')||'geen'}\nNiet vergeten: ${ctx.onv.slice(0,3).join(', ')||'leeg'}\nMomenten: ${ctx.up.slice(0,4).map(e=>e.name+' ('+e.date+')').join(', ')||'geen'}\n\nMax 130 woorden. 1 zin framing → vandaag (bullets) → niet vergeten (max 2) → groot moment dichtbij. Direct, zakelijk, warm.`;
+}
+
+async function doBriefing(){
+  const btn=document.getElementById('bb'),sb=document.getElementById('sbar'),res=document.getElementById('bres');
+  btn.disabled=true;sb.textContent='Briefing wordt opgesteld...';res.style.display='none';
+  const t=await callC(mkPrompt(getCtx(),'briefing'));
+  if(t){res.textContent=t;res.style.display='block';sb.textContent='';}else sb.textContent='Kon geen briefing ophalen.';
+  btn.disabled=false;
+}
+
+async function doMail(){
+  const btn=document.getElementById('bm'),sb=document.getElementById('sbar');
+  btn.disabled=true;sb.textContent='Mail wordt opgesteld...';
+  const ctx=getCtx();
+  const body=await callC(mkPrompt(ctx,'mail'));
+  if(body){const s=encodeURIComponent('Dagoverzicht '+ctx.dag+' '+ctx.datum+' — week '+ctx.weekNr);window.location.href='mailto:sven.tjipjes@etos.nl?subject='+s+'&body='+encodeURIComponent(body);sb.textContent='Mail geopend.';}
+  else sb.textContent='Kon geen mail opstellen.';
+  btn.disabled=false;
+}
+
+// TABS + INIT
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelector(`.tab[onclick*="'${name}'"]`).classList.add('active');
+  document.getElementById('panel-'+name).classList.add('active');
+}
+
+function init(){
+  loadAll();
+  loadKey();
+  renderWeek();
+  renderPG();
+  renderNV();
+  renderRitme();
+  renderEvents();
+  renderNotes();
+}
+
+init();
+</script>
+</body>
+</html>
